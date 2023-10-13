@@ -130,11 +130,9 @@ def btn_clicked(t):
         update_canvas()
 
 #Draw buttons
-t = 'Left'
-btn = tk.Button(root, text = 'Left', command=lambda t='Left':btn_clicked(t), height=2, width=10).place(x=70,y=452)
-btn = tk.Button(root, text = 'Up', command=lambda t='Up':btn_clicked(t), height=2, width=10).place(x=150,y=410)
-btn = tk.Button(root, text = 'Down', command=lambda t='Down':btn_clicked(t), height=2, width=10).place(x=150,y=452)
-btn = tk.Button(root, text = 'Right', command=lambda t='Right':btn_clicked(t), height=2, width=10).place(x=230,y=452)
+tk.Button(root, text = 'Left', command=lambda t='Left':btn_clicked(t), height=2, width=10).place(x=70,y=452)
+tk.Button(root, text = 'Up', command=lambda t='Up':btn_clicked(t), height=2, width=10).place(x=150,y=410)
+tk.Button(root, text = 'Down', command=lambda t='Down':btn_clicked(t), height=2, width=10).place(x=150,y=452)
+tk.Button(root, text = 'Right', command=lambda t='Right':btn_clicked(t), height=2, width=10).place(x=230,y=452)
 
 root.mainloop()
-
