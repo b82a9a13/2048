@@ -19,9 +19,11 @@ root.resizable(False,False)
 #Define the canvas varaiable
 canvas = tk.Canvas(root, width=width, height=height, bg="lightgrey")
 
-#Define start button and place it
+#Define start button and exit button, then place them
 startbtn = tk.Button(root, text='Start Game', command=lambda:start_game(), height=2, width=10)
 startbtn.place(x=(width/2)-40,y=(height/2))
+exitbtn = tk.Button(root, text='Exit', command=lambda:exit_program(), height=2, width=10)
+exitbtn.place(x=(width/2)-40, y=(height/2)+50)
 
 #Define end game button
 endbtn = tk.Button(root, text='End Game', command=lambda:end_game(), height=2, width=10)
@@ -35,10 +37,15 @@ upbtn = tk.Button(root, text='Up', height=2, width=10)
 downbtn = tk.Button(root, text='Down', height=2, width=10)
 rightbtn = tk.Button(root, text='Right', height=2, width=10)
 
+#Function is called to close the program
+def exit_program():
+    root.destroy()
+
 #Function is called to start the game
 def start_game():
     values = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
     startbtn.place_forget()
+    exitbtn.place_forget()
     def draw_canvas():
         global canvas
         #Draw verticle lines and horizontal lines
@@ -200,6 +207,7 @@ def end_game():
     endbtn.place_forget()
     restartbtn.place_forget()
     startbtn.place(x=(width/2)-40,y=(height/2))
+    exitbtn.place(x=(width/2)-40,y=(height/2)+50)
 
 #Function is called to restart the game
 def restart_game():
