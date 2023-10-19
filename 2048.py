@@ -2,6 +2,9 @@
 import tkinter as tk
 from random import randint
 from tkinter import messagebox
+from tkinter import Label
+from tkinter import filedialog
+from PIL import Image, ImageTk
 
 #Define required variables
 root = tk.Tk()
@@ -13,17 +16,19 @@ values = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
 
 #Set the application title, size and disable resizing
 root.title("2048")
-root.geometry("400x500")
+root.geometry(f"{width}x500")
 root.resizable(False,False)
 
 #Define the canvas varaiable
 canvas = tk.Canvas(root, width=width, height=height, bg="lightgrey")
 
-#Define start button and exit button, then place them
-startbtn = tk.Button(root, text='Start Game', command=lambda:start_game(), height=2, width=10)
+#Define start button, exit button and upload button, then place them
+startbtn = tk.Button(root, text='Start Game', command=lambda:start_game(), height=2, width=11)
 startbtn.place(x=(width/2)-40,y=(height/2))
-exitbtn = tk.Button(root, text='Exit', command=lambda:exit_program(), height=2, width=10)
-exitbtn.place(x=(width/2)-40, y=(height/2)+50)
+uploadbtn = tk.Button(root, text='Upload Images', command=lambda:upload_images(), height=2, width=11)
+uploadbtn.place(x=(width/2)-40, y=(height/2)+50)
+exitbtn = tk.Button(root, text='Exit', command=lambda:exit_program(), height=2, width=11)
+exitbtn.place(x=(width/2)-40, y=(height/2)+100)
 
 #Define end game button
 endbtn = tk.Button(root, text='End Game', command=lambda:end_game(), height=2, width=10)
@@ -41,11 +46,15 @@ rightbtn = tk.Button(root, text='Right', height=2, width=10)
 def exit_program():
     root.destroy()
 
+def exit_menu():
+    startbtn.place_forget()
+    exitbtn.place_forget()
+    uploadbtn.place_forget()
+
 #Function is called to start the game
 def start_game():
     values = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
-    startbtn.place_forget()
-    exitbtn.place_forget()
+    exit_menu()
     def draw_canvas():
         global canvas
         #Draw verticle lines and horizontal lines
@@ -206,13 +215,143 @@ def end_game():
     downbtn.place_forget()
     endbtn.place_forget()
     restartbtn.place_forget()
-    startbtn.place(x=(width/2)-40,y=(height/2))
-    exitbtn.place(x=(width/2)-40,y=(height/2)+50)
+    create_menu()
 
+#Function is called to create the main menu
+def create_menu():
+    startbtn.place(x=(width/2)-40,y=(height/2))
+    uploadbtn.place(x=(width/2)-40,y=(height/2)+50)
+    exitbtn.place(x=(width/2)-40,y=(height/2)+100)
+    
 #Function is called to restart the game
 def restart_game():
     canvas.pack_forget()
     canvas.delete('all')
     start_game()
+
+
+#Create Upload Buttons
+uploadText = Label(root, text='Select a image for each number')
+#Define array of upload buttons
+imageBtns = [
+    [
+        tk.Button(root, text='2', command=lambda:open_image(0)),
+        tk.Button(root, text='4', command=lambda:open_image(1)),
+        tk.Button(root, text='8', command=lambda:open_image(2)),
+        tk.Button(root, text='16', command=lambda:open_image(3))
+    ],[
+        tk.Button(root, text='32', command=lambda:open_image(4)),
+        tk.Button(root, text='64', command=lambda:open_image(5)),
+        tk.Button(root, text='128', command=lambda:open_image(6)),
+        tk.Button(root, text='256', command=lambda:open_image(7))
+    ],[
+        tk.Button(root, text='512', command=lambda:open_image(8)),
+        tk.Button(root, text='1028', command=lambda:open_image(9)),
+        tk.Button(root, text='2048', command=lambda:open_image(10))
+    ]
+]
+#Array used to store the images
+img = [None, None, None, None, None, None, None, None, None, None, None]
+#Array used to store the labels
+labels = [None, None, None, None, None, None, None, None, None, None, None]
+#Submit button
+subBtn = tk.Button(root, text='Submit Images', command=lambda:submit_images())
+#.place(x=350, y=450)
+subError = Label(root, text='You are missing image(s) for numbered value(s)', fg='red')
+#Error text
+panel = Label(root, text='Invalid Image size, it must be 100px by 100px', fg='red')
+#Back button
+backBtn = tk.Button(root, text='Go Back', command=lambda:upload_back())
+#Function is called when the back button is clicked
+def upload_back():
+    uploadText.pack_forget()
+    for x in imageBtns:
+        for y in x:
+            y.place_forget()
+    subBtn.place_forget()
+    backBtn.place_forget()
+    for x in labels:
+        if x != None:
+            x.place_forget()
+    del_img_error()
+    create_menu()
+#Function is called to open the upload images section
+
+def upload_images():
+    #Remvoe menu buttons
+    exit_menu()
+    #Title
+    uploadText.pack(side="top")
+    xp = 0;
+    #Place upload image buttons
+    for x in imageBtns:
+        yp = 0
+        for y in x:
+            if xp == 0:
+                y.place(x=155+(20*yp),y=75)
+            elif xp == 1:
+                if yp > 2:
+                    y.place(x=142+(27*yp),y=105)
+                else:
+                    y.place(x=142+(25*yp),y=105)
+            elif xp == 2:
+                if yp > 1:
+                    y.place(x=146+(33*yp),y=135)
+                else:
+                    y.place(x=146+(30*yp),y=135)
+            yp += 1
+        xp += 1
+    #Add back and submit buttons
+    subBtn.place(x=305, y=135)
+    backBtn.place(x=5, y=135)
+
+#Function is called to remove image error messages
+def del_img_error():
+    #forget error pack if it exists
+    subError.pack_forget()
+    panel.pack_forget()
+def open_image(pos):
+    #Need to include a global varaible to store the img
+    global img
+    del_img_error()
+    #get fjle and define the allowed file types
+    filePath = filedialog.askopenfilename(filetypes=[("Image files", "*.png *.jpg *.jpeg *.gif *.bmp *.ppm *.pgm")])
+    if filePath:
+        with open(filePath, "rb") as image_file:
+            #Create a variable with the image
+            im = Image.open(filePath)
+            #Check the size of the image is 100x100
+            width, height = im.size
+            if width != 100 and height != 100:
+                #Output error message
+                panel.pack(side="top")
+            else:
+                #Define the x and y position dependant on the position provided
+                xPos = 0
+                yPos = 175
+                if pos > 0:
+                    if pos >= 8 or pos >= 4:
+                        if pos >= 8:
+                            xPos += 100*((pos-4)%4)+50
+                        elif pos >= 4:
+                            xPos += 100*(pos%4)   
+                        yPos += 102*(pos//4)
+                    else:
+                        xPos += 100*pos
+                #Create a image variable within an array
+                img[pos] = ImageTk.PhotoImage(im)
+                #Forget the old pack if it exists
+                if labels[pos] != None:
+                    labels[pos].pack_forget()
+                #Add the image to a label and pack to the UI
+                labels[pos] = Label(root, image=img[pos])
+                labels[pos].place(x=xPos, y=yPos)
+
+def submit_images():
+    del_img_error()
+    if any(value == None for value in img) == True:
+        subError.pack(side='top')
+    else:
+        upload_back()
 
 root.mainloop()
