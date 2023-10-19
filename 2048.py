@@ -58,7 +58,7 @@ imageBtns = [
         tk.Button(root, text='256', command=lambda:open_image(7))
     ],[
         tk.Button(root, text='512', command=lambda:open_image(8)),
-        tk.Button(root, text='1028', command=lambda:open_image(9)),
+        tk.Button(root, text='1024', command=lambda:open_image(9)),
         tk.Button(root, text='2048', command=lambda:open_image(10))
     ]
 ]
@@ -105,14 +105,20 @@ def start_game():
             y = randint(0,3)
             xx = randint(0,3)
         values[y][xx] = 2
-        if xx == 0 and y == 0:
-            canvas.create_text(secheight/2, secwidth/2, text=values[y][xx], fill='black', font=('Arial 25 bold'))
-        elif xx == 0:
-            canvas.create_text(secheight/2, (secwidth*y)+(secwidth/2), text=values[y][xx], fill='black', font=('Arial 25 bold'))
+        xPos = secwidth/2
+        yPos = secheight/2
+        if xx == 0:
+            yPos = (secheight*y)+(secheight/2)
         elif y == 0:
-            canvas.create_text((secheight*xx)+(secheight/2), secwidth/2, text=values[y][xx], fill='black', font=('Arial 25 bold'))
+            xPos = (secwidth*xx)+(secwidth/2)
         else:
-            canvas.create_text((secheight*xx)+(secheight/2), (secwidth*y)+(secwidth/2), text=values[y][xx], fill='black', font=('Arial 25 bold'))
+            xPos = (secwidth*xx)+(secwidth/2)
+            yPos = (secheight*y)+(secheight/2)
+        if has_images() == True:
+            canvas.create_image(xPos, yPos, image=img[0])
+        else:
+            canvas.create_text(xPos, yPos, text=values[y][xx], fill='black', font=('Arial 25 bold'))
+    #How to add image = canvas.create_image(50,50, image=img[0])
     canvas.pack()
 
     #Draw buttons and add a command for when the button is clicked
@@ -171,15 +177,30 @@ def start_game():
                 for x in range(len(values[y])):
                     #If the value equals zero, replace it with ''
                     current = values[y][x] if values[y][x] != 0 else ''
-                    #Draw the values onto the canvas
-                    if x == 0 and y == 0:
-                        canvas.create_text(secheight/2, secwidth/2, text=current, fill='black', font=('Arial 25 bold'))
-                    elif x == 0:
-                        canvas.create_text(secheight/2, (secwidth*y)+(secwidth/2), text=current, fill='black', font=('Arial 25 bold'))
+                    xPos = secwidth/2
+                    yPos = secheight/2
+                    if x == 0:
+                        yPos = (secheight*y)+(secheight/2)
                     elif y == 0:
-                        canvas.create_text((secheight*x)+(secheight/2), secwidth/2, text=current, fill='black', font=('Arial 25 bold'))
+                        xPos = (secwidth*x)+(secwidth/2)
                     else:
-                        canvas.create_text((secheight*x)+(secheight/2), (secwidth*y)+(secwidth/2), text=current, fill='black', font=('Arial 25 bold'))
+                        xPos = (secwidth*x)+(secwidth/2)
+                        yPos = (secheight*y)+(secheight/2)
+                    #Draw the values onto the canvas
+                    if has_images() == True:
+                        if current != '':
+                            count = 0
+                            if current != 2:
+                                result = 0
+                                base = 2
+                                while result <= current:
+                                    result = base*2
+                                    if result <= current:
+                                        count += 1
+                                        base = result
+                            canvas.create_image(xPos, yPos, image=img[count])
+                    else:
+                        canvas.create_text(xPos, yPos, text=current, fill='black', font=('Arial 25 bold'))
             #Output the canvas
             canvas.pack()
                 
@@ -270,11 +291,12 @@ def upload_back():
             y.place_forget()
     subBtn.place_forget()
     backBtn.place_forget()
-    for x in labels:
-        if x != None:
-            x.place_forget()
+    for y in labels:
+        if y != None:
+            y.place_forget()
     del_img_error()
     create_menu()
+
 #Function is called to open the upload images section
 def upload_images():
     #Remvoe menu buttons
@@ -300,6 +322,24 @@ def upload_images():
                     y.place(x=146+(30*yp),y=135)
             yp += 1
         xp += 1
+    #Place images from memeory if there is any
+    pos = 0
+    for x in labels:
+        if x != None:
+            #Define the x and y position dependant on the position provided
+            xPos = 0
+            yPos = 175
+            if pos > 0:
+                if pos >= 8 or pos >= 4:
+                    if pos >= 8:
+                        xPos += 100*((pos-4)%4)+50
+                    elif pos >= 4:
+                        xPos += 100*(pos%4)   
+                    yPos += 102*(pos//4)
+                else:
+                    xPos += 100*pos
+            x.place(x=xPos, y=yPos)
+        pos += 1
     #Add back and submit buttons
     subBtn.place(x=305, y=135)
     backBtn.place(x=5, y=135)
@@ -355,5 +395,12 @@ def submit_images():
         subError.pack(side='top')
     else:
         upload_back()
+
+#Check if all required images have been uploaded
+def has_images():
+    if any(value == None for value in img) == True:
+        return False
+    else:
+        return True
 
 root.mainloop()
