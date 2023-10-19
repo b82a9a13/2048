@@ -12,16 +12,13 @@ height = 400
 width = 400
 secheight = 400/4
 secwidth = 400/4
-values = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
 
 #Set the application title, size and disable resizing
 root.title("2048")
 root.geometry(f"{width}x500")
 root.resizable(False,False)
 
-#Define the canvas varaiable
-canvas = tk.Canvas(root, width=width, height=height, bg="lightgrey")
-
+#Main Menu
 #Define start button, exit button and upload button, then place them
 startbtn = tk.Button(root, text='Start Game', command=lambda:start_game(), height=2, width=11)
 startbtn.place(x=(width/2)-40,y=(height/2))
@@ -30,17 +27,53 @@ uploadbtn.place(x=(width/2)-40, y=(height/2)+50)
 exitbtn = tk.Button(root, text='Exit', command=lambda:exit_program(), height=2, width=11)
 exitbtn.place(x=(width/2)-40, y=(height/2)+100)
 
+#Game Menu
+#Define the canvas varaiable
+canvas = tk.Canvas(root, width=width, height=height, bg="lightgrey")
 #Define end game button
 endbtn = tk.Button(root, text='End Game', command=lambda:end_game(), height=2, width=10)
-
 #Define restart game button
 restartbtn = tk.Button(root, text='Restart Game', command=lambda:restart_game(), height=2, width=10)
-
 #Define game buttons
 leftbtn = tk.Button(root, text='Left', height=2, width=10)
 upbtn = tk.Button(root, text='Up', height=2, width=10)
 downbtn = tk.Button(root, text='Down', height=2, width=10)
 rightbtn = tk.Button(root, text='Right', height=2, width=10)
+values = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+
+#Upload Menu
+#Create Upload Buttons
+uploadText = Label(root, text='Select a image for each number')
+#Define array of upload buttons
+imageBtns = [
+    [
+        tk.Button(root, text='2', command=lambda:open_image(0)),
+        tk.Button(root, text='4', command=lambda:open_image(1)),
+        tk.Button(root, text='8', command=lambda:open_image(2)),
+        tk.Button(root, text='16', command=lambda:open_image(3))
+    ],[
+        tk.Button(root, text='32', command=lambda:open_image(4)),
+        tk.Button(root, text='64', command=lambda:open_image(5)),
+        tk.Button(root, text='128', command=lambda:open_image(6)),
+        tk.Button(root, text='256', command=lambda:open_image(7))
+    ],[
+        tk.Button(root, text='512', command=lambda:open_image(8)),
+        tk.Button(root, text='1028', command=lambda:open_image(9)),
+        tk.Button(root, text='2048', command=lambda:open_image(10))
+    ]
+]
+#Array used to store the images
+img = [None, None, None, None, None, None, None, None, None, None, None]
+#Array used to store the labels
+labels = [None, None, None, None, None, None, None, None, None, None, None]
+#Submit button
+subBtn = tk.Button(root, text='Submit Images', command=lambda:submit_images())
+#.place(x=350, y=450)
+subError = Label(root, text='You are missing image(s) for numbered value(s)', fg='red')
+#Error text
+panel = Label(root, text='Invalid Image size, it must be 100px by 100px', fg='red')
+#Back button
+backBtn = tk.Button(root, text='Go Back', command=lambda:upload_back())
 
 #Function is called to close the program
 def exit_program():
@@ -229,39 +262,6 @@ def restart_game():
     canvas.delete('all')
     start_game()
 
-
-#Create Upload Buttons
-uploadText = Label(root, text='Select a image for each number')
-#Define array of upload buttons
-imageBtns = [
-    [
-        tk.Button(root, text='2', command=lambda:open_image(0)),
-        tk.Button(root, text='4', command=lambda:open_image(1)),
-        tk.Button(root, text='8', command=lambda:open_image(2)),
-        tk.Button(root, text='16', command=lambda:open_image(3))
-    ],[
-        tk.Button(root, text='32', command=lambda:open_image(4)),
-        tk.Button(root, text='64', command=lambda:open_image(5)),
-        tk.Button(root, text='128', command=lambda:open_image(6)),
-        tk.Button(root, text='256', command=lambda:open_image(7))
-    ],[
-        tk.Button(root, text='512', command=lambda:open_image(8)),
-        tk.Button(root, text='1028', command=lambda:open_image(9)),
-        tk.Button(root, text='2048', command=lambda:open_image(10))
-    ]
-]
-#Array used to store the images
-img = [None, None, None, None, None, None, None, None, None, None, None]
-#Array used to store the labels
-labels = [None, None, None, None, None, None, None, None, None, None, None]
-#Submit button
-subBtn = tk.Button(root, text='Submit Images', command=lambda:submit_images())
-#.place(x=350, y=450)
-subError = Label(root, text='You are missing image(s) for numbered value(s)', fg='red')
-#Error text
-panel = Label(root, text='Invalid Image size, it must be 100px by 100px', fg='red')
-#Back button
-backBtn = tk.Button(root, text='Go Back', command=lambda:upload_back())
 #Function is called when the back button is clicked
 def upload_back():
     uploadText.pack_forget()
@@ -276,7 +276,6 @@ def upload_back():
     del_img_error()
     create_menu()
 #Function is called to open the upload images section
-
 def upload_images():
     #Remvoe menu buttons
     exit_menu()
@@ -310,6 +309,8 @@ def del_img_error():
     #forget error pack if it exists
     subError.pack_forget()
     panel.pack_forget()
+
+#Function is called to open a image file
 def open_image(pos):
     #Need to include a global varaible to store the img
     global img
@@ -347,6 +348,7 @@ def open_image(pos):
                 labels[pos] = Label(root, image=img[pos])
                 labels[pos].place(x=xPos, y=yPos)
 
+#Function is called when the image submit button is clicked
 def submit_images():
     del_img_error()
     if any(value == None for value in img) == True:
